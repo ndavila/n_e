@@ -1,0 +1,39 @@
+import numpy as np
+from astropy import constants as astro_const
+from astropy import units as u
+from scipy import constants as sci_const
+
+
+def n_Hminus( n_e, T ):
+  T = T * u.K
+  n_e = n_e / ( u.cm**3 )
+  return \
+    np.power( n_e, 3 ) / (
+      np.power( ( astro_const.m_e.cgs * astro_const.k_B.cgs * T /
+      2 * sci_const.pi * np.power( astro_const.hbar.cgs, 2 ) ), 3 ) \
+      * np.exp( ( (14.3 * u.eV).cgs + 2 * astro_const.m_e.cgs * \
+      np.power(astro_const.c.cgs, 2 ) ) \
+      / ( astro_const.k_B.cgs * T ) ) - np.power( n_e,2 ) )
+
+def n_Hplus( n_e, T ):
+  T =  T * u.K
+  n_e = n_e / ( u.cm**3 )
+  return \
+    np.power( \
+      n_e, 3 ) / (
+     np.power( ( astro_const.m_e.cgs * astro_const.k_B.cgs * T /
+     2 * sci_const.pi * np.power( astro_const.hbar.cgs, 2 ) ), 3 ) \
+     * np.exp( ( (14.3 * u.eV).cgs + 2 * astro_const.m_e.cgs * \
+     np.power(astro_const.c.cgs, 2 ) \
+     / ( astro_const.k_B.cgs * T ) ) ) - np.power( n_e**2 ) ) + n_e
+
+def nH( n_e, T ):
+  T = T * u.K
+  n_e = n_e / ( u.cm**3 )
+  return \
+    np.sqrt( \
+      n_Hplus * n_Hminus * np.exp(( (14.3 * u.eV).cgs \
+      + 2 * astro_const.m_e.cgs  / ( astro_const.k_B.cgs * T ) ) ) )
+
+def f( n_e, n, T ):
+    return -n + n_Hplus( n_e, T ) + n_H( n_e, T ) + n_Hminus( n_e, T )
